@@ -81,7 +81,7 @@ const newGame = function(properties){
         this.joinSpecificGame = function(gameId,playerId){
             let ga = this.games.find((g) => {
                 return g.players.find((player) => {
-                    return player.id == playerId;
+                    return player.socketId == playerId;
                 })
             })
             
@@ -105,7 +105,7 @@ const newGame = function(properties){
         this.joinGame = function(playerId){
             let ga = this.games.find((g) => {
                 return g.players.find((player) => {
-                    return player.id == playerId;
+                    return player.socketId == playerId;
                 })
             })
   
@@ -131,7 +131,7 @@ const newGame = function(properties){
         this.move = function(playerId,move){
             let ga = this.games.find((g) => {
                 return g.players.find((player) => {
-                    return player.id == playerId;
+                    return player.socketId == playerId;
                 })
             })
   
@@ -154,7 +154,7 @@ const newGame = function(properties){
   
             this.move = (playerId,move) => {
                 let player = state.playersConfigArray.find((pl) => {
-                    return pl.id == playerId
+                    return pl.socketId == playerId
                 })
 
                 const blocker = startBlockerFunction(minPlayers,maxPlayers,state.playersConfigArray,state)
@@ -188,7 +188,7 @@ const newGame = function(properties){
 
                 let copyState =  JSON.parse(JSON.stringify(state));
                 const player = state.playersConfigArray.find((pl) => {
-                    return pl.id == playerId
+                    return pl.socketId == playerId
                 })
                 if(player){
                     copyState = statePresenter(copyState,player.ref)
@@ -197,7 +197,7 @@ const newGame = function(properties){
             }
   
             this.join = (playerId) => {
-                    const player = {id:playerId,ref:'player'+(this.players.length+1)}
+                    const player = {socketId:playerId,ref:'player'+(this.players.length+1)}
                     this.players.push(player);
   
                     state.playersConfigArray = this.players;
@@ -208,7 +208,7 @@ const newGame = function(properties){
             }
             this.disconnect = (playerId) => {
                     let pl =this.players.find((pl) => {
-                        return pl.id == playerId;
+                        return pl.socketId == playerId;
                     })
                     this.players.splice(this.players.indexOf(pl),1);
 
@@ -238,7 +238,7 @@ module.exports.newIOServer = function newServer(properties,io){
                 else{
                     game.timeFunction();
                     game.players.forEach((player) => {
-                        io.to(player.id).emit('returnState',game.returnState(player.id))
+                        io.to(player.socketId).emit('returnState',game.returnState(player.socketId))
                     })
                 }
             })
@@ -253,11 +253,12 @@ module.exports.newIOServer = function newServer(properties,io){
                 let isThisIt = false;
 
                 game.players.forEach((player) => {
-                    if(player.id === socket.id){
+                    if(player.socketId === socket.id){
+                        console.log('vliza tuk')
                         isThisIt = true;
                     }
                 })
-
+                
                 return isThisIt;
             })
 
@@ -276,7 +277,6 @@ module.exports.newIOServer = function newServer(properties,io){
         })
         
         socket.on('move', (data) =>{
-            console.log('vliza')
           lobby.move(socket.id,data);
         })
       });
