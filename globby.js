@@ -19,7 +19,7 @@ const newGame = function(properties){
 
     const startBlockerFunction = properties.startBlockerFunction || function(minPlayers,maxPlayers,currentPlayers,state){
         /* 
-            Return Undefined for a new game and an object to join the old one
+            Return Undefined to start game and an object to block
         */
         if(minPlayers == maxPlayers){
             //Nqma custom minPlayers ot suzdatelq
