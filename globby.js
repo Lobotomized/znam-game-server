@@ -170,7 +170,6 @@ const newGame = function(properties){
             this.timeFunction = () => {
                 
                 const blocker = startBlockerFunction(minPlayers,maxPlayers,state.playersConfigArray,state)
-
                 if(blocker !=undefined){
                     return blocker;
                 }
@@ -178,12 +177,16 @@ const newGame = function(properties){
                 if(timeFunction != undefined){
                     timeFunction(state)
                 }
-
-                return this.returnState();
             }
   
             this.returnState = (playerId) => {
-                let copyState =  JSON.parse(JSON.stringify(state));
+
+                const blocker = startBlockerFunction(minPlayers,maxPlayers,state.playersConfigArray,state)
+                if(blocker !=undefined){
+                    return blocker;
+                }
+
+                const copyState =  JSON.parse(JSON.stringify(state));
                 let player = state.playersConfigArray.find((pl) => {
                     return pl.id == playerId
                 })
@@ -234,9 +237,9 @@ module.exports.newIOServer = function newServer(properties,io){
                     lobby.games.splice(lobby.games.indexOf(game),1)
                 }
                 else{
-                    const state = game.timeFunction();
+                    game.timeFunction();
                     game.players.forEach((player) => {
-                        io.to(player.id).emit('returnState',state)
+                        io.to(player.id).emit('returnState',game.returnState(player.id))
                     })
                 }
             })
