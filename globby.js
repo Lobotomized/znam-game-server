@@ -186,12 +186,11 @@ const newGame = function(properties){
                     return blocker;
                 }
 
-                const copyState =  JSON.parse(JSON.stringify(state));
-                let player = state.playersConfigArray.find((pl) => {
+                let copyState =  JSON.parse(JSON.stringify(state));
+                const player = state.playersConfigArray.find((pl) => {
                     return pl.id == playerId
                 })
                 if(player){
-                     
                     copyState = statePresenter(copyState,player.ref)
                 }
                 return copyState
@@ -277,13 +276,8 @@ module.exports.newIOServer = function newServer(properties,io){
         })
         
         socket.on('move', (data) =>{
-          let state = lobby.move(socket.id,data);
-          if(state.playersConfigArray){
-            state.playersConfigArray.forEach((pl) => {
-                io.to(pl.id).emit('returnState', state)
-             })
-          }
-
+            console.log('vliza')
+          lobby.move(socket.id,data);
         })
       });
 }

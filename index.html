@@ -11,9 +11,12 @@ socket.on('returnState', (state) => {
                 console.log(state)
             }) // Return State
 
-socket.emit('move',{type:'moveX',speed:-50}) // Send Move
 
 
+document.addEventListener('keydown' , () =>{
+    socket.emit('move',{})
+    console.log('vliza')
+})
 </script>
 
 
