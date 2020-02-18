@@ -1,4 +1,4 @@
-module.exports.delayStartBlocker = function(delay){
+function delayStartBlocker(delay){
 
     return function(minPlayers,maxPlayers,currentPlayers,state){
         if(state.started){
@@ -6,6 +6,7 @@ module.exports.delayStartBlocker = function(delay){
         }
 
         if(minPlayers > currentPlayers.length){
+            state.delayCounter = delay;
             return {message:"Not Enough Players to Start", minPlayers:minPlayers, currentPlayers:currentPlayers.length}
         }
 
@@ -32,6 +33,19 @@ module.exports.delayStartBlocker = function(delay){
             }
         }
     }
+}
 
+function startedJoinBlocker(minPlayers,maxPlayers,currentPlayers,state){
+  if(state.started){
+    return false;
+  }
+  else{
+    return true;
+  }
+}
+
+module.exports.delayStartBlocker = {
+    startBlockerFunction:delayStartBlocker,
+    joinBlockerFunction:startedJoinBlocker
 }
 

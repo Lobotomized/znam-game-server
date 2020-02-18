@@ -14,6 +14,14 @@ socket.on('returnState', (state) => {
 socket.emit('move',{type:'moveX',speed:-50}) // Send Move
 
 
+socket.on('games', (data) => {
+    console.log(data, '  games')
+})
+
+function giveGame(){
+    socket.emit('games')
+
+}
 </script>
 
 
@@ -26,6 +34,5 @@ socket.emit('move',{type:'moveX',speed:-50}) // Send Move
     <title>Document</title>
 </head>
 <body>
-    
 </body>
 </html>

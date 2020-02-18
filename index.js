@@ -22,18 +22,8 @@ newG({
     state.test +=5;
     //State Change on every frame
   },
-  startBlockerFunction:delayStartBlocker(1000),
-  joinBlockerFunction:function(minPlayers,maxPlayers,currentPlayers,state){
-      /*
-        Return true if you want the user to join the same room AND false to return a new room
-      */
-    if(state.started){
-      return false;
-    }
-    else{
-      return true;
-    }
-  },
+  startBlockerFunction:delayStartBlocker.startBlockerFunction(1000),
+  joinBlockerFunction:delayStartBlocker.joinBlockerFunction,
   statePresenter:function(state,playerRef){
     
     return state;

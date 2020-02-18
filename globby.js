@@ -144,12 +144,11 @@ const newGame = function(properties){
         }
     }
   
-    function g(id){
+    function g(){
   
             let state = JSON.parse(JSON.stringify(baseState));
             state.playersConfigArray = this.players;
             
-            this.id = id;
             this.playerId = '';
             this.players = [];
   
@@ -267,6 +266,11 @@ module.exports.newIOServer = function newServer(properties,io){
         })
         
         lobby.joinGame(socket.id)
+
+
+        socket.on('games', () => {
+            io.to(socket.id).emit('games',lobby.games)
+        })
         
         socket.on('move', (data) =>{
           let state = lobby.move(socket.id,data);
