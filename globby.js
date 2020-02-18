@@ -1,8 +1,8 @@
 const newGame = function(properties){
     let baseState = properties.baseState || {};
     
-    const timeFunction = properties.timeFunction || function(player,move,state){};
-    const moveFunction = properties.moveFunction || function(state){};
+    const timeFunction = properties.timeFunction || function(state){};
+    const moveFunction = properties.moveFunction || function(staplayer,move,state){};
     const maxPlayers = properties.maxPlayers || 2;
     const minPlayers = properties.minPlayers || maxPlayers;
     const statePresenter = properties.statePresenter || function(copyState,playerRef){
@@ -167,7 +167,7 @@ const newGame = function(properties){
                 return this.returnState(playerId);
             }
 
-            this.timeFunction = (playerId) => {
+            this.timeFunction = () => {
                 
                 const blocker = startBlockerFunction(minPlayers,maxPlayers,state.playersConfigArray,state)
 
@@ -176,10 +176,10 @@ const newGame = function(properties){
                 }
 
                 if(timeFunction != undefined){
-                    timeFunction(state,playerId)
+                    timeFunction(state)
                 }
 
-                return this.returnState(playerId);
+                return this.returnState();
             }
   
             this.returnState = (playerId) => {
@@ -234,8 +234,9 @@ module.exports.newIOServer = function newServer(properties,io){
                     lobby.games.splice(lobby.games.indexOf(game),1)
                 }
                 else{
+                    const state = game.timeFunction();
                     game.players.forEach((player) => {
-                        io.to(player.id).emit('returnState',game.timeFunction(player.id))
+                        io.to(player.id).emit('returnState',state)
                     })
                 }
             })
