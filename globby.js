@@ -96,21 +96,21 @@ const newGame = function (properties) {
                 this.games.push(ga)
                 ga.join(socketId, playerId)
             }
-            return ga.returnState(playerId);
+            return ga.returnState(socketId);
         }
 
 
 
-        this.move = function (playerId, move) {
+        this.move = function (socketId, move) {
             let ga = this.games.find((g) => {
                 return g.players.find((player) => {
-                    return player.socketId == playerId;
+                    return player.socketId == socketId;
                 })
             })
             if (!ga) {
                 return
             }
-            return ga.move(playerId, move);
+            return ga.move(socketId, move);
         }
     }
 
@@ -174,6 +174,7 @@ const newGame = function (properties) {
             return this.returnState(socketId);
 
         }
+
         this.disconnect = (socketId) => {
             let pl = this.players.find((pl) => {
                 return pl.socketId == socketId;
