@@ -1,283 +1,250 @@
-const newGame = function(properties){
+const newGame = function (properties) {
     let baseState = properties.baseState || {};
-    
-    const timeFunction = properties.timeFunction || function(state){};
-    const moveFunction = properties.moveFunction || function(staplayer,move,state){};
+
+    const timeFunction = properties.timeFunction || function (state) { };
+    const moveFunction = properties.moveFunction || function (staplayer, move, state) { };
     const maxPlayers = properties.maxPlayers || 2;
     const minPlayers = properties.minPlayers || maxPlayers;
-    const statePresenter = properties.statePresenter || function(copyState,playerRef){
+    const statePresenter = properties.statePresenter || function (copyState, playerRef) {
         return copyState
     }
 
-    const connectFunction = properties.connectFunction || function(state,playerRef){
-
-    }
-    
-    const disconnectFunction = properties.disconnectFunction || function(state,playerRef){
+    const connectFunction = properties.connectFunction || function (state, playerRef) {
 
     }
 
-    const startBlockerFunction = properties.startBlockerFunction || function(minPlayers,maxPlayers,currentPlayers,state){
+    const disconnectFunction = properties.disconnectFunction || function (state, playerRef) {
+
+    }
+
+    const startBlockerFunction = properties.startBlockerFunction || function (minPlayers, maxPlayers, currentPlayers, state) {
         /* 
             Return Undefined to start game and an object to block
         */
-        if(minPlayers == maxPlayers){
+        if (minPlayers == maxPlayers) {
             //Nqma custom minPlayers ot suzdatelq
-            if(state.started){
+            if (state.started) {
                 return;
             }
-            else if(!state.started && currentPlayers.length == maxPlayers){
+            else if (!state.started && currentPlayers.length == maxPlayers) {
                 state.started = true;
             }
-            else{
-                return {message:"Not Enough Players To Start",required:minPlayers,current:currentPlayers.length}; // Return object while you want users to join the same room
+            else {
+                return { message: "Not Enough Players To Start", required: minPlayers, current: currentPlayers.length }; // Return object while you want users to join the same room
             }
         }
-        else{
-            if(currentPlayers.length < minPlayers && !state.started){
-                return {message:"Not Enough Players To Start",required:minPlayers,current:currentPlayers.length}; // Return object while you want users to join the same room
+        else {
+            if (currentPlayers.length < minPlayers && !state.started) {
+                return { message: "Not Enough Players To Start", required: minPlayers, current: currentPlayers.length }; // Return object while you want users to join the same room
             }
-            else{
+            else {
                 state.started = true;
                 return;// Return undefined when you want the user to join new game
             }
         }
     }
 
-    const allowJoinFunction = properties.joinBlockerFunction || function(minPlayers,maxPlayers,currentPlayers,state){
+    const allowJoinFunction = properties.joinBlockerFunction || function (minPlayers, maxPlayers, currentPlayers, state) {
         /*
         Return true if you want the user to join the same room AND false to return a new room
         */
-        if(minPlayers == maxPlayers){
+        if (minPlayers == maxPlayers) {
             //Nqma custom minPlayers ot suzdatelq
-            if(!state.started){
+            if (!state.started) {
                 return true // Return true if you want users to join the same room
             }
-            else{
+            else {
                 return false //Return false if you want a new room to be open for the user
             }
         }
-        else{
-            if(currentPlayers.length < maxPlayers){
+        else {
+            if (currentPlayers.length < maxPlayers) {
                 return true;// Return false when you want the user to join a new game
             }
-            else{
+            else {
                 return false;
             }
         }
-
-
-        
     }
 
-    const lobby = function(){
+    const lobby = function () {
         this.games = [];
-        
-  
-        this.gamesNum = function(){
+
+
+        this.gamesNum = function () {
             return games.length
         }
 
-        this.joinSpecificGame = function(gameId,playerId){
+        this.joinGame = function (socketId, playerId) {
             let ga = this.games.find((g) => {
                 return g.players.find((player) => {
-                    return player.socketId == playerId;
+                    return player.socketId == socketId;
                 })
             })
-            
-            if(!ga){
-                ga = this.games.find((g) => {
-                    let st =  g.returnState(playerId);
-                    return allowJoinFunction(minPlayers,maxPlayers,st.players,st)
-                })
 
-                if(ga){
-                    ga.join(playerId);
-                }
-            }
-            else{
-                ga = new g(gameId);
-                this.games.push(ga)
-                ga.join(playerId)
-            }
-        }
-  
-        this.joinGame = function(playerId){
-            let ga = this.games.find((g) => {
-                return g.players.find((player) => {
-                    return player.socketId == playerId;
-                })
-            })
-  
-            if(!ga){
+            if (!ga) {
                 ga = this.games.find((g) => {
-                    let st =  g.returnState(playerId);
-                    return allowJoinFunction(minPlayers,maxPlayers,st.players,st)
+                    let st = g.returnState(socketId);
+                    return allowJoinFunction(minPlayers, maxPlayers, st.players, st)
                 })
-                if(ga){
-                    ga.join(playerId);
+                if (ga) {
+                    ga.join(socketId, playerId);
                 }
             }
-            if(!ga){
+            if (!ga) {
                 ga = new g();
                 this.games.push(ga)
-                ga.join(playerId)
+                ga.join(socketId, playerId)
             }
             return ga.returnState(playerId);
         }
 
-        
-  
-        this.move = function(playerId,move){
+
+
+        this.move = function (playerId, move) {
             let ga = this.games.find((g) => {
                 return g.players.find((player) => {
                     return player.socketId == playerId;
                 })
             })
-  
-            
-            if(!ga){
+            if (!ga) {
                 return
             }
-            
-            return ga.move(playerId,move);
+            return ga.move(playerId, move);
         }
     }
-  
-    function g(){
-  
-            let state = JSON.parse(JSON.stringify(baseState));
-            state.playersConfigArray = this.players;
-            
-            this.playerId = '';
-            this.players = [];
-  
-            this.move = (playerId,move) => {
-                let player = state.playersConfigArray.find((pl) => {
-                    return pl.socketId == playerId
-                })
 
-                const blocker = startBlockerFunction(minPlayers,maxPlayers,state.playersConfigArray,state)
+    function g() {
 
-                if(blocker !=undefined){
-                    return blocker;
-                }
+        let state = JSON.parse(JSON.stringify(baseState));
+        state.playersConfigArray = this.players;
+        this.players = [];
 
-                moveFunction(player, move,state)
-                return this.returnState(playerId);
+        this.move = (socketId, move) => {
+            let player = state.playersConfigArray.find((pl) => {
+                return pl.socketId == socketId
+            })
+
+            const blocker = startBlockerFunction(minPlayers, maxPlayers, state.playersConfigArray, state)
+
+            if (blocker != undefined) {
+                return blocker;
             }
 
-            this.timeFunction = () => {
-                
-                const blocker = startBlockerFunction(minPlayers,maxPlayers,state.playersConfigArray,state)
-                if(blocker !=undefined){
-                    return blocker;
-                }
+            moveFunction(player, move, state)
+            return this.returnState(socketId);
+        }
 
-                if(timeFunction != undefined){
-                    timeFunction(state)
-                }
+        this.timeFunction = () => {
+
+            const blocker = startBlockerFunction(minPlayers, maxPlayers, state.playersConfigArray, state)
+            if (blocker != undefined) {
+                return blocker;
             }
-  
-            this.returnState = (playerId) => {
 
-                const blocker = startBlockerFunction(minPlayers,maxPlayers,state.playersConfigArray,state)
-                if(blocker !=undefined){
-                    return blocker;
-                }
-
-                let copyState =  JSON.parse(JSON.stringify(state));
-                const player = state.playersConfigArray.find((pl) => {
-                    return pl.socketId == playerId
-                })
-                if(player){
-                    copyState = statePresenter(copyState,player.ref)
-                }
-                return copyState
-            }
-  
-            this.join = (playerId) => {
-                    const player = {socketId:playerId,ref:'player'+(this.players.length+1)}
-                    this.players.push(player);
-  
-                    state.playersConfigArray = this.players;
-                    
-                    connectFunction(state,player.ref)
-                    return this.returnState(playerId);
-     
-            }
-            this.disconnect = (playerId) => {
-                    let pl =this.players.find((pl) => {
-                        return pl.socketId == playerId;
-                    })
-                    this.players.splice(this.players.indexOf(pl),1);
-
-                    disconnectFunction(state,pl.ref)
+            if (timeFunction != undefined) {
+                timeFunction(state)
             }
         }
-  
+
+        this.returnState = (socketId) => {
+
+            const blocker = startBlockerFunction(minPlayers, maxPlayers, state.playersConfigArray, state)
+            if (blocker != undefined) {
+                return blocker;
+            }
+
+            let copyState = JSON.parse(JSON.stringify(state));
+            const player = state.playersConfigArray.find((pl) => {
+                return pl.socketId == socketId
+            })
+            if (player) {
+                copyState = statePresenter(copyState, player.ref)
+            }
+            return copyState
+        }
+
+        this.join = (socketId, playerId) => {
+            const player = { socketId: socketId, ref: 'player' + (this.players.length + 1), playerId: socketId || playerId }
+            this.players.push(player);
+
+            state.playersConfigArray = this.players;
+
+            connectFunction(state, player.ref)
+            return this.returnState(socketId);
+
+        }
+        this.disconnect = (socketId) => {
+            let pl = this.players.find((pl) => {
+                return pl.socketId == socketId;
+            })
+            this.players.splice(this.players.indexOf(pl), 1);
+
+            disconnectFunction(state, pl.ref)
+        }
+    }
+
     return lobby
-  
-  }
+
+}
 
 
-module.exports.newGame =  newGame;
+module.exports.newGame = newGame;
 
 
-module.exports.newIOServer = function newServer(properties,io){
+module.exports.newIOServer = function newServer(properties, io) {
     let g = newGame(properties);
     const frameRate = properties.delay || 100;
     const lobby = new g();
-    
-    const helperFunctionDelay = function(){
-        setTimeout(()=>{
+
+    const helperFunctionDelay = function () {
+        setTimeout(() => {
             lobby.games.forEach((game) => {
-                if(!game.players.length){
-                    lobby.games.splice(lobby.games.indexOf(game),1)
+                if (!game.players.length) {
+                    lobby.games.splice(lobby.games.indexOf(game), 1)
                 }
-                else{
+                else {
                     game.timeFunction();
                     game.players.forEach((player) => {
-                        io.to(player.socketId).emit('returnState',game.returnState(player.socketId))
+                        io.to(player.socketId).emit('returnState', game.returnState(player.socketId))
                     })
                 }
             })
             helperFunctionDelay();
-        },frameRate)
+        }, frameRate)
     }
     helperFunctionDelay();
 
-    io.on('connection', function(socket){
+    io.on('connection', function (socket) {
         socket.on('disconnect', () => {
-            let game  = lobby.games.find((game) =>{
+            let game = lobby.games.find((game) => {
                 let isThisIt = false;
 
                 game.players.forEach((player) => {
-                    if(player.socketId === socket.id){
-                        console.log('vliza tuk')
+                    if (player.socketId === socket.id) {
                         isThisIt = true;
                     }
                 })
-                
+
                 return isThisIt;
             })
 
             game.disconnect(socket.id)
-            if(!game.players.length){
+            if (!game.players.length) {
                 lobby.games.splice(lobby.games.indexOf(game), 1)
             }
 
         })
-        
+
         lobby.joinGame(socket.id)
 
 
         socket.on('games', () => {
-            io.to(socket.id).emit('games',lobby.games)
+            io.to(socket.id).emit('games', lobby.games)
         })
-        
-        socket.on('move', (data) =>{
-          lobby.move(socket.id,data);
+
+        socket.on('move', (data) => {
+            lobby.move(socket.id, data);
         })
-      });
+    });
 }
