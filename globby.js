@@ -75,7 +75,7 @@ const newGame = function (properties) {
             return games.length
         }
 
-        this.joinGame = function (socketId, playerId) {
+        this.joinGame = function (socketId) {
             let ga = this.games.find((g) => {
                 return g.players.find((player) => {
                     return player.socketId == socketId;
@@ -88,13 +88,13 @@ const newGame = function (properties) {
                     return allowJoinFunction(minPlayers, maxPlayers, st.players, st)
                 })
                 if (ga) {
-                    ga.join(socketId, playerId);
+                    ga.join(socketId);
                 }
             }
             if (!ga) {
                 ga = new g();
                 this.games.push(ga)
-                ga.join(socketId, playerId)
+                ga.join(socketId)
             }
             return ga.returnState(socketId);
         }
@@ -164,8 +164,8 @@ const newGame = function (properties) {
             return copyState
         }
 
-        this.join = (socketId, playerId) => {
-            const player = { socketId: socketId, ref: 'player' + (this.players.length + 1), playerId: socketId || playerId }
+        this.join = (socketId) => {
+            const player = { socketId: socketId, ref: 'player' + (this.players.length + 1) }
             this.players.push(player);
 
             state.playersConfigArray = this.players;
