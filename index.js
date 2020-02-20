@@ -9,45 +9,45 @@ const delayStartBlocker = require('./blockers').delayStartBlocker
 app.use('/static', express.static('public'))
 
 newG({
-  baseState:{
+  baseState: {
     //Starting State
-    test:5
+    test: 5
   },
-  moveFunction:function(player,move,state){
+  moveFunction: function (player, move, state) {
     //State Change on Move
-    state[player.ref].x+=25;
+    state[player.ref].x += 25;
   },
-  minPlayers:2,
-  maxPlayers:3, // Number of Players you want in a single game
-  timeFunction:function(state){
-    state.test +=5;
+  minPlayers: 2,
+  maxPlayers: 3, // Number of Players you want in a single game
+  timeFunction: function (state) {
+    state.test += 5;
     //State Change on every frame
   },
-  startBlockerFunction:delayStartBlocker.startBlockerFunction(1000),
-  joinBlockerFunction:delayStartBlocker.joinBlockerFunction,
-  statePresenter:function(state,playerRef){
-    
+  startBlockerFunction: delayStartBlocker.startBlockerFunction(1000),
+  joinBlockerFunction: delayStartBlocker.joinBlockerFunction,
+  statePresenter: function (state, playerRef) {
+
     return state;
   },
-  connectFunction:function(state,playerRef){
+  connectFunction: function (state, playerRef) {
     state[playerRef] = {
-      x:50,
-      y:50
+      x: 50,
+      y: 50
     }
   },
-  disconnectFunction:function(state,playerRef){
+  disconnectFunction: function (state, playerRef) {
     state[playerRef] = undefined;
   }
 },
 
-io)
+  io)
 
 
-app.get('/', function(req, res){
-    return res.status(200).sendFile(__dirname + '/index.html');
-  });
+app.get('/', function (req, res) {
+  return res.status(200).sendFile(__dirname + '/index.html');
+});
 
 
-http.listen(3005, function(){
+http.listen(3005, function () {
   console.log('listening on *:3000');
 });

@@ -75,6 +75,24 @@ const newGame = function (properties) {
             return games.length
         }
 
+        this.disconnectGame = function (socketId) {
+            const game = this.games.find((game) => {
+                let isThisIt = false;
+
+                game.players.forEach((player) => {
+                    if (player.socketId === socketId) {
+                        isThisIt = true;
+                    }
+                })
+                return isThisIt;
+            })
+
+            game.disconnect(socketId)
+            if (!game.players.length) {
+                this.games.splice(this.games.indexOf(game), 1)
+            }
+        }
+
         this.joinGame = function (socketId) {
             let ga = this.games.find((g) => {
                 return g.players.find((player) => {
@@ -218,23 +236,7 @@ module.exports.newIOServer = function newServer(properties, io) {
 
     io.on('connection', function (socket) {
         socket.on('disconnect', () => {
-            let game = lobby.games.find((game) => {
-                let isThisIt = false;
-
-                game.players.forEach((player) => {
-                    if (player.socketId === socket.id) {
-                        isThisIt = true;
-                    }
-                })
-
-                return isThisIt;
-            })
-
-            game.disconnect(socket.id)
-            if (!game.players.length) {
-                lobby.games.splice(lobby.games.indexOf(game), 1)
-            }
-
+            lobby.disconnectGame(socket.id)
         })
 
         lobby.joinGame(socket.id)
