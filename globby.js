@@ -216,6 +216,7 @@ module.exports.newIOServer = function newServer(properties, io) {
     const frameRate = properties.delay || 100;
     const lobby = new g();
 
+
     const helperFunctionDelay = function () {
         setTimeout(() => {
             lobby.games.forEach((game) => {
@@ -225,7 +226,7 @@ module.exports.newIOServer = function newServer(properties, io) {
                 else {
                     game.timeFunction();
                     game.players.forEach((player) => {
-                        io.to(player.socketId).emit('returnState', game.returnState(player.socketId))
+                        io.to(player.socketId).emit('returnState', game.returnState(player.socketId)) //First player.socketId is mandatory
                     })
                 }
             })
@@ -235,15 +236,12 @@ module.exports.newIOServer = function newServer(properties, io) {
     helperFunctionDelay();
 
     io.on('connection', function (socket) {
-        socket.on('disconnect', () => {
-            lobby.disconnectGame(socket.id)
-        })
+
 
         lobby.joinGame(socket.id)
 
-
-        socket.on('games', () => {
-            io.to(socket.id).emit('games', lobby.games)
+        socket.on('disconnect', () => {
+            lobby.disconnectGame(socket.id)
         })
 
         socket.on('move', (data) => {
