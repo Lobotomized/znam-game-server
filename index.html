@@ -14,8 +14,8 @@ socket.on('returnState', (state) => {
 
 
 document.addEventListener('keydown' , () =>{
-    socket.emit('move',{})
-    console.log('vliza')
+    socket.emit('hello',Math.random())
+    console.log(Math.random())
 })
 </script>
 

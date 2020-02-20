@@ -40,7 +40,8 @@ newG({
   }
 },
 
-  io)
+  io,
+  true)
 
 
 app.get('/', function (req, res) {

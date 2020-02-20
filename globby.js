@@ -93,7 +93,8 @@ const newGame = function (properties) {
             }
         }
 
-        this.joinGame = function (socketId) {
+        this.joinGame = function (socketId,playerId) {
+            console.log('wow')
             let ga = this.games.find((g) => {
                 return g.players.find((player) => {
                     return player.socketId == socketId;
@@ -106,13 +107,14 @@ const newGame = function (properties) {
                     return allowJoinFunction(minPlayers, maxPlayers, st.players, st)
                 })
                 if (ga) {
-                    ga.join(socketId);
+                    ga.join(socketId,playerId);
                 }
             }
+            
             if (!ga) {
                 ga = new g();
                 this.games.push(ga)
-                ga.join(socketId)
+                ga.join(socketId,playerId)
             }
             return ga.returnState(socketId);
         }
@@ -182,8 +184,11 @@ const newGame = function (properties) {
             return copyState
         }
 
-        this.join = (socketId) => {
+        this.join = (socketId,playerId) => {
             const player = { socketId: socketId, ref: 'player' + (this.players.length + 1) }
+            if(playerId){
+                player.hello = playerId;
+            }
             this.players.push(player);
 
             state.playersConfigArray = this.players;
@@ -211,7 +216,7 @@ const newGame = function (properties) {
 module.exports.newGame = newGame;
 
 
-module.exports.newIOServer = function newServer(properties, io) {
+module.exports.newIOServer = function newServer(properties, io,hello) {
     let g = newGame(properties);
     const frameRate = properties.delay || 100;
     const lobby = new g();
@@ -226,7 +231,15 @@ module.exports.newIOServer = function newServer(properties, io) {
                 else {
                     game.timeFunction();
                     game.players.forEach((player) => {
-                        io.to(player.socketId).emit('returnState', game.returnState(player.socketId)) //First player.socketId is mandatory
+                        if(!hello){
+                            io.to(player.socketId).emit('returnState', game.returnState(player.socketId)) //First player.socketId is mandatory
+                        }
+                        else{
+                            if(player.hello){
+                                console.log('vliza tuk')
+                                io.to(player.socketId).emit('returnState', game.returnState(player.hello)) //First player.socketId is mandatory
+                            }
+                        }
                     })
                 }
             })
@@ -237,15 +250,25 @@ module.exports.newIOServer = function newServer(properties, io) {
 
     io.on('connection', function (socket) {
 
+        if(!hello){
+            lobby.joinGame(socket.id)
 
-        lobby.joinGame(socket.id)
+            socket.on('disconnect', () => {
+                lobby.disconnectGame(socket.id)
+            })
+    
+            socket.on('move', (data) => {
+                lobby.move(socket.id, data);
+            })
+        }
+        else{
+            
+            socket.on('hello', (data) => {
+                console.log(data)
+                lobby.joinGame(socket.id,data);
+            })
+        }
 
-        socket.on('disconnect', () => {
-            lobby.disconnectGame(socket.id)
-        })
 
-        socket.on('move', (data) => {
-            lobby.move(socket.id, data);
-        })
     });
 }
