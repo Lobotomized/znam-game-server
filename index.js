@@ -11,7 +11,15 @@ app.use('/static', express.static('public'))
 newG({
   baseState: {
     //Starting State
-    test: 5
+    player1: {
+      x: 50, y: 50
+    },
+    player2: {
+      x: 50, y: 50
+    },
+    player3: {
+      x: 50, y: 50
+    }
   },
   moveFunction: function (player, move, state) {
     //State Change on Move
@@ -30,10 +38,10 @@ newG({
     return state;
   },
   connectFunction: function (state, playerRef) {
-    state[playerRef] = {
-      x: 50,
-      y: 50
-    }
+    // state[playerRef] = {
+    //   x: 50,
+    //   y: 50
+    // }
   },
   disconnectFunction: function (state, playerRef) {
     // state[playerRef] = undefined;

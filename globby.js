@@ -202,12 +202,24 @@ const newGame = function (properties) {
         }
 
         this.join = (socketId, playerId) => {
-            const player = { socketId: socketId, ref: 'player' + (this.players.length + 1) }
+            const player = { socketId: socketId, ref: 'player' + (this.players.length + 1 + this.disconnected.length) }
             if (playerId) {
                 player.hello = playerId;
+                const existing = this.disconnected.find((pl) => {
+                    return pl.hello == player.hello
+                })
+                if (existing) {
+                    existing.socketId = socketId
+                    this.players.push(existing);
+                    this.disconnected.splice(this.disconnected.indexOf(existing), 1);
+                }
+                else {
+                    this.players.push(player)
+                }
             }
-            this.players.push(player);
-
+            else {
+                this.players.push(player);
+            }
             state.playersConfigArray = this.players;
 
             connectFunction(state, player.ref)
@@ -222,11 +234,11 @@ const newGame = function (properties) {
             if (!pl) {
                 return;
             }
-            if (!pl.playerId) {
+            if (!pl.hello) {
                 this.players.splice(this.players.indexOf(pl), 1);
             }
             else {
-                this.players.disconnected.push(this.players[this.players.indexOf(pl)])
+                this.disconnected.push(this.players[this.players.indexOf(pl)])
                 this.players.splice(this.players.indexOf(pl), 1);
             }
 
