@@ -75,37 +75,49 @@ const newGame = function (properties) {
             return games.length
         }
 
-        this.disconnectGame = function (socketId) {
+        this.disconnectGame = function (socketId, playerId) {
             const game = this.games.find((game) => {
                 let isThisIt = false;
 
                 game.players.forEach((player) => {
-                    if (player.socketId === socketId) {
+                    if (player.socketId == socketId || player.hello == playerId) {
                         isThisIt = true;
                     }
                 })
                 return isThisIt;
             })
 
-            game.disconnect(socketId)
-            if (!game.players.length) {
-                this.games.splice(this.games.indexOf(game), 1)
+            if(game){
+                game.disconnect(socketId)
+                if (!game.players.length) {
+                    this.games.splice(this.games.indexOf(game), 1)
+                }
             }
         }
 
         this.joinGame = function (socketId,playerId) {
-            console.log('wow')
             let ga = this.games.find((g) => {
+
+                if(playerId){
+                    return g.players.find((player) => {
+                        if(player.hello == playerId && player.socketId != socketId){
+                            player.socketId = socketId
+                        }
+                        return player.hello == playerId
+                    })  
+                }
+
                 return g.players.find((player) => {
-                    return player.socketId == socketId;
+                    return player.socketId == socketId
                 })
             })
 
             if (!ga) {
                 ga = this.games.find((g) => {
-                    let st = g.returnState(socketId);
-                    return allowJoinFunction(minPlayers, maxPlayers, st.players, st)
+                    let st = g.returnState(playerId);
+                    return allowJoinFunction(minPlayers, maxPlayers, g.players, st)
                 })
+                
                 if (ga) {
                     ga.join(socketId,playerId);
                 }
@@ -116,6 +128,11 @@ const newGame = function (properties) {
                 this.games.push(ga)
                 ga.join(socketId,playerId)
             }
+
+            if(playerId){
+                return ga.returnState(playerId);
+            }
+
             return ga.returnState(socketId);
         }
 
@@ -130,7 +147,7 @@ const newGame = function (properties) {
             if (!ga) {
                 return
             }
-            return ga.move(socketId, move);
+            ga.move(socketId, move);
         }
     }
 
@@ -139,6 +156,7 @@ const newGame = function (properties) {
         let state = JSON.parse(JSON.stringify(baseState));
         state.playersConfigArray = this.players;
         this.players = [];
+        this.disconnected = [];
 
         this.move = (socketId, move) => {
             let player = state.playersConfigArray.find((pl) => {
@@ -152,7 +170,6 @@ const newGame = function (properties) {
             }
 
             moveFunction(player, move, state)
-            return this.returnState(socketId);
         }
 
         this.timeFunction = () => {
@@ -194,7 +211,6 @@ const newGame = function (properties) {
             state.playersConfigArray = this.players;
 
             connectFunction(state, player.ref)
-            return this.returnState(socketId);
 
         }
 
@@ -202,7 +218,17 @@ const newGame = function (properties) {
             let pl = this.players.find((pl) => {
                 return pl.socketId == socketId;
             })
-            this.players.splice(this.players.indexOf(pl), 1);
+            
+            if(!pl){
+                return;
+            }
+            if(!pl.playerId){
+                this.players.splice(this.players.indexOf(pl), 1);
+            }
+            else{
+                this.players.disconnected.push(this.players[this.players.indexOf(pl)])
+                this.players.splice(this.players.indexOf(pl), 1);
+            }
 
             disconnectFunction(state, pl.ref)
         }
@@ -236,7 +262,6 @@ module.exports.newIOServer = function newServer(properties, io,hello) {
                         }
                         else{
                             if(player.hello){
-                                console.log('vliza tuk')
                                 io.to(player.socketId).emit('returnState', game.returnState(player.hello)) //First player.socketId is mandatory
                             }
                         }
@@ -265,7 +290,15 @@ module.exports.newIOServer = function newServer(properties, io,hello) {
             
             socket.on('hello', (data) => {
                 console.log(data)
+                socket.hello = data;
                 lobby.joinGame(socket.id,data);
+            })
+
+
+            socket.on('disconnect', () => {
+                if(socket.hello){
+                    lobby.disconnectGame(socket.id,socket.hello)
+                }
             })
         }
 

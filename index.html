@@ -13,10 +13,11 @@ socket.on('returnState', (state) => {
 
 
 
-document.addEventListener('keydown' , () =>{
-    socket.emit('hello',Math.random())
-    console.log(Math.random())
-})
+function enterName(){
+    console.log(document.getElementById('name').value)
+    socket.emit('hello',document.getElementById('name').value)
+
+}
 </script>
 
 
@@ -27,6 +28,9 @@ document.addEventListener('keydown' , () =>{
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+
+    <input type="text" id="name">
+    <button onclick="enterName()">nat is</button>
 </head>
 <body>
 </body>

@@ -23,8 +23,8 @@ newG({
     state.test += 5;
     //State Change on every frame
   },
-  startBlockerFunction: delayStartBlocker.startBlockerFunction(1000),
-  joinBlockerFunction: delayStartBlocker.joinBlockerFunction,
+  // startBlockerFunction: delayStartBlocker.startBlockerFunction(1000),
+  // joinBlockerFunction: delayStartBlocker.joinBlockerFunction,
   statePresenter: function (state, playerRef) {
 
     return state;
