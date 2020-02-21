@@ -87,7 +87,7 @@ const newGame = function (properties) {
                 return isThisIt;
             })
 
-            if(game){
+            if (game) {
                 game.disconnect(socketId)
                 if (!game.players.length) {
                     this.games.splice(this.games.indexOf(game), 1)
@@ -95,16 +95,16 @@ const newGame = function (properties) {
             }
         }
 
-        this.joinGame = function (socketId,playerId) {
+        this.joinGame = function (socketId, playerId) {
             let ga = this.games.find((g) => {
 
-                if(playerId){
+                if (playerId) {
                     return g.players.find((player) => {
-                        if(player.hello == playerId && player.socketId != socketId){
+                        if (player.hello == playerId && player.socketId != socketId) {
                             player.socketId = socketId
                         }
                         return player.hello == playerId
-                    })  
+                    })
                 }
 
                 return g.players.find((player) => {
@@ -117,19 +117,19 @@ const newGame = function (properties) {
                     let st = g.returnState(playerId);
                     return allowJoinFunction(minPlayers, maxPlayers, g.players, st)
                 })
-                
+
                 if (ga) {
-                    ga.join(socketId,playerId);
+                    ga.join(socketId, playerId);
                 }
             }
-            
+
             if (!ga) {
                 ga = new g();
                 this.games.push(ga)
-                ga.join(socketId,playerId)
+                ga.join(socketId, playerId)
             }
 
-            if(playerId){
+            if (playerId) {
                 return ga.returnState(playerId);
             }
 
@@ -201,9 +201,9 @@ const newGame = function (properties) {
             return copyState
         }
 
-        this.join = (socketId,playerId) => {
+        this.join = (socketId, playerId) => {
             const player = { socketId: socketId, ref: 'player' + (this.players.length + 1) }
-            if(playerId){
+            if (playerId) {
                 player.hello = playerId;
             }
             this.players.push(player);
@@ -218,14 +218,14 @@ const newGame = function (properties) {
             let pl = this.players.find((pl) => {
                 return pl.socketId == socketId;
             })
-            
-            if(!pl){
+
+            if (!pl) {
                 return;
             }
-            if(!pl.playerId){
+            if (!pl.playerId) {
                 this.players.splice(this.players.indexOf(pl), 1);
             }
-            else{
+            else {
                 this.players.disconnected.push(this.players[this.players.indexOf(pl)])
                 this.players.splice(this.players.indexOf(pl), 1);
             }
@@ -242,7 +242,7 @@ const newGame = function (properties) {
 module.exports.newGame = newGame;
 
 
-module.exports.newIOServer = function newServer(properties, io,hello) {
+module.exports.newIOServer = function newServer(properties, io, hello) {
     let g = newGame(properties);
     const frameRate = properties.delay || 100;
     const lobby = new g();
@@ -257,11 +257,11 @@ module.exports.newIOServer = function newServer(properties, io,hello) {
                 else {
                     game.timeFunction();
                     game.players.forEach((player) => {
-                        if(!hello){
+                        if (!hello) {
                             io.to(player.socketId).emit('returnState', game.returnState(player.socketId)) //First player.socketId is mandatory
                         }
-                        else{
-                            if(player.hello){
+                        else {
+                            if (player.hello) {
                                 io.to(player.socketId).emit('returnState', game.returnState(player.hello)) //First player.socketId is mandatory
                             }
                         }
@@ -275,29 +275,34 @@ module.exports.newIOServer = function newServer(properties, io,hello) {
 
     io.on('connection', function (socket) {
 
-        if(!hello){
+        if (!hello) {
             lobby.joinGame(socket.id)
 
             socket.on('disconnect', () => {
                 lobby.disconnectGame(socket.id)
             })
-    
+
             socket.on('move', (data) => {
                 lobby.move(socket.id, data);
             })
         }
-        else{
-            
+        else {
+
             socket.on('hello', (data) => {
-                console.log(data)
                 socket.hello = data;
-                lobby.joinGame(socket.id,data);
+                lobby.joinGame(socket.id, data);
             })
 
 
             socket.on('disconnect', () => {
-                if(socket.hello){
-                    lobby.disconnectGame(socket.id,socket.hello)
+                if (socket.hello) {
+                    lobby.disconnectGame(socket.id, socket.hello)
+                }
+            })
+
+            socket.on('move', (data) => {
+                if (socket.hello) {
+                    lobby.move(socket.id, data);
                 }
             })
         }

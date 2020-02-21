@@ -36,7 +36,7 @@ newG({
     }
   },
   disconnectFunction: function (state, playerRef) {
-    state[playerRef] = undefined;
+    // state[playerRef] = undefined;
   }
 },
 
