@@ -1,23 +1,22 @@
 const newGame = function (properties) {
     let baseState = properties.baseState || {};
 
-    const timeFunction = properties.timeFunction || function (state,outerReference) { };
-    const moveFunction = properties.moveFunction || function (staplayer, move, state,outerReference) { };
+    const timeFunction = properties.timeFunction || function (state) { };
+    const moveFunction = properties.moveFunction || function (staplayer, move, state) { };
     const maxPlayers = properties.maxPlayers || 2;
     const minPlayers = properties.minPlayers || maxPlayers;
-    const statePresenter = properties.statePresenter || function (copyState, playerRef,outerReference) {
+    const statePresenter = properties.statePresenter || function (copyState, playerRef) {
         return copyState
     }
 
-    const connectFunction = properties.connectFunction || function (state, playerRef,outerReference) {
+    const connectFunction = properties.connectFunction || function (state, playerRef) {
 
     }
 
-    const disconnectFunction = properties.disconnectFunction || function (state, playerRef,outerReference) {
+    const disconnectFunction = properties.disconnectFunction || function (state, playerRef) {
 
     }
 
-    const outerReference = properties.outerReference || {};
 
     const startBlockerFunction = properties.startBlockerFunction || function (minPlayers, maxPlayers, currentPlayers, state) {
         /* 
@@ -171,7 +170,7 @@ const newGame = function (properties) {
                 return blocker;
             }
 
-            moveFunction(player, move, state,outerReference)
+            moveFunction(player, move, state)
         }
 
         this.timeFunction = () => {
@@ -182,7 +181,7 @@ const newGame = function (properties) {
             }
 
             if (timeFunction != undefined) {
-                timeFunction(state,outerReference)
+                timeFunction(state)
             }
         }
 
@@ -198,7 +197,7 @@ const newGame = function (properties) {
                 return pl.socketId == socketId
             })
             if (player) {
-                copyState = statePresenter(copyState, player.ref,outerReference)
+                copyState = statePresenter(copyState, player.ref)
             }
             return copyState
         }
@@ -224,7 +223,7 @@ const newGame = function (properties) {
             }
             state.playersConfigArray = this.players;
 
-            connectFunction(state, player.ref,outerReference)
+            connectFunction(state, player.ref)
 
         }
 
@@ -244,7 +243,7 @@ const newGame = function (properties) {
                 this.players.splice(this.players.indexOf(pl), 1);
             }
 
-            disconnectFunction(state, pl.ref,outerReference)
+            disconnectFunction(state, pl.ref)
         }
     }
 
