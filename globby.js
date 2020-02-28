@@ -18,6 +18,8 @@ const newGame = function (properties) {
     }
 
 
+
+
     const startBlockerFunction = properties.startBlockerFunction || function (minPlayers, maxPlayers, currentPlayers, state) {
         /* 
             Return Undefined to start game and an object to block
@@ -90,7 +92,10 @@ const newGame = function (properties) {
 
             if (game) {
                 game.disconnect(socketId)
-                if (!game.players.length) {
+                const nonBots = game.players.filter((pl) => {
+                    return pl.socketId.substring(0, 10) == 'thisisabot'
+                })
+                if (!nonBots.length) {
                     this.games.splice(this.games.indexOf(game), 1)
                 }
             }
@@ -255,12 +260,21 @@ const newGame = function (properties) {
 module.exports.newGame = newGame;
 
 
-module.exports.newIOServer = function newServer(properties, io, hello) {
+module.exports.newIOServer = function newServer(properties, io, hello, botConfig) {
     let g = newGame(properties);
     const frameRate = properties.delay || 100;
     const lobby = new g();
+    const maxPlayers = properties.maxPlayers || 2;
+    const minPlayers = properties.minPlayers || maxPlayers;
+    botConfig = botConfig || {};
+    const joinBotFunction = botConfig.joinBotFunction || function (game, minPlayers, maxPlayers) {
+        //game.joinGame('thisisabot'+randomString)
+    }
+    console.log(joinBotFunction)
 
+    const botAIFunction = botConfig.botAIFunction || function (game, bot) {
 
+    }
     const helperFunctionDelay = function () {
         setTimeout(() => {
             lobby.games.forEach((game) => {
@@ -269,8 +283,12 @@ module.exports.newIOServer = function newServer(properties, io, hello) {
                 }
                 else {
                     game.timeFunction();
+                    joinBotFunction(game, minPlayers, maxPlayers)
                     game.players.forEach((player) => {
-                        if (!hello) {
+                        if (player.socketId.substring(0, 10) == 'thisisabot') {
+                            botAIFunction(game, player)
+                        }
+                        else if (!hello) {
                             io.to(player.socketId).emit('returnState', game.returnState(player.socketId)) //First player.socketId is mandatory
                         }
                         else {
@@ -319,7 +337,7 @@ module.exports.newIOServer = function newServer(properties, io, hello) {
                 }
             })
         }
-
-
     });
+
+
 }
