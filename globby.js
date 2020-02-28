@@ -142,6 +142,9 @@ const newGame = function (properties) {
             return ga.returnState(socketId);
         }
 
+        this.botJoin = function (socketId, playerId) {
+
+        }
 
 
         this.move = function (socketId, move) {
@@ -207,6 +210,12 @@ const newGame = function (properties) {
             return copyState
         }
 
+        this.joinBot = (id) => {
+            if (!playerId) {
+                this.join('thisisabot' + id)
+            }
+        }
+
         this.join = (socketId, playerId) => {
             const player = { socketId: socketId, ref: 'player' + (this.players.length + 1 + this.disconnected.length) }
             if (playerId) {
@@ -270,7 +279,7 @@ module.exports.newIOServer = function newServer(properties, io, hello, botConfig
     const joinBotFunction = botConfig.joinBotFunction || function (game, minPlayers, maxPlayers) {
         //game.joinGame('thisisabot'+randomString)
     }
-    console.log(joinBotFunction)
+
 
     const botAIFunction = botConfig.botAIFunction || function (game, bot) {
 
