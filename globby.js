@@ -211,9 +211,7 @@ const newGame = function (properties) {
         }
 
         this.joinBot = (id) => {
-            if (!playerId) {
-                this.join('thisisabot' + id)
-            }
+            this.join('thisisabot' + id)
         }
 
         this.join = (socketId, playerId) => {

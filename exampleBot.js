@@ -43,7 +43,7 @@ newG({
     {
         joinBotFunction: function (game, minPlayers, maxPlayers) {
             if (game.players.length < 3 && game.players.length > 1) {
-                game.join('thisisabot')
+                // game.joinBot('tralala')
             }
         },
         botAIFunction: function (game, bot) {
