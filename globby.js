@@ -248,6 +248,7 @@ const newGame = function (properties) {
                 return;
             }
             if (!pl.hello) {
+                this.disconnected.push(this.players[this.players.indexOf(pl)])
                 this.players.splice(this.players.indexOf(pl), 1);
             }
             else {
