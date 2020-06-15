@@ -16,14 +16,13 @@ newG({
         //State Change on Move
         state[player.ref].x += 25;
     },
-    minPlayers: 2,
-    maxPlayers: 3, // Number of Players you want in a single game
+    maxPlayers: 2, // Number of Players you want in a single game
     timeFunction: function (state) {
         state.test += 5;
         //State Change on every frame
     },
-    startBlockerFunction: delayStartBlocker.startBlockerFunction(1000),
-    joinBlockerFunction: delayStartBlocker.joinBlockerFunction,
+    // startBlockerFunction: delayStartBlocker.startBlockerFunction(1000),
+    // joinBlockerFunction: delayStartBlocker.joinBlockerFunction,
     statePresenter: function (state, playerRef) {
 
         return state;
@@ -42,10 +41,10 @@ newG({
 
 
 app.get('/', function (req, res) {
-    return res.status(200).sendFile(__dirname + '/exampleBot.html');
+    return res.status(200).sendFile(__dirname + '/exampleBasic.html');
 });
 
 
-http.listen(3005, function () {
+http.listen(3000, function () {
     console.log('listening on *:3000');
 });
