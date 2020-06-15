@@ -54,7 +54,6 @@ const newGame = function (properties) {
         if (minPlayers == maxPlayers) {
             //Nqma custom minPlayers ot suzdatelq
             if (!state.started) {
-                console.log('vliza tuk')
                 return true // Return true if you want users to join the same room
             }
             else {
