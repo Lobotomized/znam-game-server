@@ -83,7 +83,7 @@ const newGame = function (properties) {
                 let isThisIt = false;
 
                 game.players.forEach((player) => {
-                    if (player.socketId == socketId || player.hello == playerId) {
+                    if (player.socketId == socketId || player.hello == playerId && playerId !== undefined) {
                         isThisIt = true;
                     }
                 })
