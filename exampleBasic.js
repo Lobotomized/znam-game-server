@@ -180,7 +180,7 @@ newG({
 
                   if(state.players[playerRef].timeLeftToAnswer <= 0){
 
-                      if(questions[state.players[playerRef].currentQuestionIndex]){
+                      if(questions[state.players[playerRef].currentQuestionIndex] != undefined){
                           state.players[playerRef].currentQuestionIndex += 1;
                           state.question[playerRef] = questions[state.players[playerRef].currentQuestionIndex]
                           state.players[playerRef].timeLeftToAnswer = TIME_TO_ANSWER;
