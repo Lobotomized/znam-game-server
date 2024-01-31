@@ -158,7 +158,6 @@ newG({
                     state.players[playerRef].score += 1;
                 }
                 state.players[playerRef].betweenQuestionsTime = TIME_BETWEEN_QUESTIONS;
-                state.players[playerRef].timeLeftToAnswer = TIME_TO_ANSWER;
             }
 
             state.players[playerRef].currentQuestionIndex += 1;
@@ -172,6 +171,9 @@ newG({
             Object.keys(state.players).forEach((playerRef) => {
                 if(state.players[playerRef].betweenQuestionsTime){
                   state.players[playerRef].betweenQuestionsTime -= 1;
+                  if(state.players[playerRef].betweenQuestionsTime <= 0){
+                    state.players[playerRef].timeLeftToAnswer = TIME_TO_ANSWER;
+                  }
                 }
                 else{
                   state.players[playerRef].timeLeftToAnswer -= 1;
