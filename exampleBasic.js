@@ -169,31 +169,32 @@ newG({
         maxPlayers: 2, // Number of Players you want in a single game
         timeFunction: function (state) {
             Object.keys(state.players).forEach((playerRef) => {
-                if(state.players[playerRef].betweenQuestionsTime){
-                  state.players[playerRef].betweenQuestionsTime -= 1;
-                  if(state.players[playerRef].betweenQuestionsTime <= 0){
-                    state.players[playerRef].timeLeftToAnswer = TIME_TO_ANSWER;
+                if(!state.players[playerRef].finished){
+                  if(state.players[playerRef].betweenQuestionsTime){
+                    state.players[playerRef].betweenQuestionsTime -= 1;
+                    if(state.players[playerRef].betweenQuestionsTime <= 0){
+                      state.players[playerRef].timeLeftToAnswer = TIME_TO_ANSWER;
+                    }
                   }
-                }
-                else{
-                  state.players[playerRef].timeLeftToAnswer -= 1;
-
-                  if(state.players[playerRef].timeLeftToAnswer <= 0){
-
-                      if(questions[state.players[playerRef].currentQuestionIndex] != undefined){
-                          state.players[playerRef].currentQuestionIndex += 1;
-                          state.question[playerRef] = questions[state.players[playerRef].currentQuestionIndex]
-                          state.players[playerRef].timeLeftToAnswer = TIME_TO_ANSWER;
-                          state.playerAnswers[playerRef] = {};
-                          state.playerAnswers[playerRef].yourAnswer = undefined;
-                          state.playerAnswers[playerRef].correctAnswer = correctAnswers[state.players[playerRef].currentQuestionIndex]?.answerIndex
-                          state.players[playerRef].betweenQuestionsTime = TIME_BETWEEN_QUESTIONS;
-                      }
+                  else{
+                    state.players[playerRef].timeLeftToAnswer -= 1;
+  
+                    if(state.players[playerRef].timeLeftToAnswer <= 0){
+  
+                        if(questions[state.players[playerRef].currentQuestionIndex] != undefined){
+                            state.players[playerRef].currentQuestionIndex += 1;
+                            state.question[playerRef] = questions[state.players[playerRef].currentQuestionIndex]
+                            state.playerAnswers[playerRef] = {};
+                            state.playerAnswers[playerRef].yourAnswer = undefined;
+                            state.playerAnswers[playerRef].correctAnswer = correctAnswers[state.players[playerRef].currentQuestionIndex]?.answerIndex
+                            state.players[playerRef].betweenQuestionsTime = TIME_BETWEEN_QUESTIONS;
+                        }
+                    }
                   }
-                }
-
-                if(state.players[playerRef].betweenQuestionsTime <= 0 && state.players[playerRef].currentQuestionIndex > (questions.length - 1) ){
-                    state.players[playerRef].finished = true;
+  
+                  if(state.players[playerRef].betweenQuestionsTime <= 0 && state.players[playerRef].currentQuestionIndex > (questions.length - 1) ){
+                      state.players[playerRef].finished = true;
+                  }
                 }
             })
             
