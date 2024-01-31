@@ -12,7 +12,8 @@ const delayStartBlocker = require('./blockers').delayStartBlocker
 // };
 // score = score + addBonus(answer.extraTime, consecutiveIndex)
 
-const TIME_TO_ANSWER = 120;
+const TIME_TO_ANSWER = 20;
+const TIME_BETWEEN_QUESTIONS = 2;
 
 const correctAnswers = [
     {
@@ -139,26 +140,30 @@ app.use('/static', express.static('public'))
 newG({
         baseState: {
             players:{},
-            question:{}
+            question:{},
+            playerAnswers: {}
         },
         moveFunction: function (player, move, state) {
             const playerRef = player.ref;
             const playerAnswered = move.answer;
-            let currentQuestionIndex = state.players[playerRef].currentQuestionIndex
-
-            if(playerAnswered != undefined && questions[currentQuestionIndex]){
+            if(playerAnswered != undefined && questions[state.players[playerRef].currentQuestionIndex]){
                 //Nameri dali e pravilen otgovora
-                const isAnswerCorrect =  correctAnswers[currentQuestionIndex].answerIndex === playerAnswered;
+                state.playerAnswers[playerRef] = {
+                  yourAnswer:move.answer,
+                  correctAnswer: correctAnswers[state.players[playerRef].currentQuestionIndex].answerIndex
+                };
+                const isAnswerCorrect =  correctAnswers[state.players[playerRef].currentQuestionIndex].answerIndex === playerAnswered;
                 //Ako e correct da dadem to4ka
                 if(isAnswerCorrect){
                     state.players[playerRef].score += 1;
                 }
-                state.players[playerRef].currentQuestionIndex += 1;
-                currentQuestionIndex += 1;
+                state.players[playerRef].betweenQuestionsTime = TIME_BETWEEN_QUESTIONS;
             }
 
-            if(questions[currentQuestionIndex]){
-                state.question[playerRef] = questions[currentQuestionIndex]
+            state.players[playerRef].currentQuestionIndex += 1;
+
+            if(questions[state.players[playerRef].currentQuestionIndex]){
+                state.question[playerRef] = questions[state.players[playerRef].currentQuestionIndex]
             }
             else{
                 state.players[playerRef].finished = true;
@@ -167,17 +172,26 @@ newG({
         maxPlayers: 2, // Number of Players you want in a single game
         timeFunction: function (state) {
             Object.keys(state.players).forEach((playerRef) => {
-                state.players[playerRef].timeLeftToAnswer -= 1;
+                if(state.players[playerRef].betweenQuestionsTime){
+                  state.players[playerRef].betweenQuestionsTime -= 1;
+                }
+                else{
+                  state.players[playerRef].timeLeftToAnswer -= 1;
 
-                if(state.players[playerRef].timeLeftToAnswer <= 0){
-                    if(questions[state.players[playerRef].currentQuestionIndex]){
-                        state.players[playerRef].currentQuestionIndex += 1;
-                        state.question[playerRef] = questions[state.players[playerRef].currentQuestionIndex]
-                        state.players[playerRef].timeLeftToAnswer = TIME_TO_ANSWER;                    
-                    }
-                    else{
-                        state.players[playerRef].finished = true;
-                    }
+                  if(state.players[playerRef].timeLeftToAnswer <= 0){
+                      if(questions[state.players[playerRef].currentQuestionIndex]){
+                          state.players[playerRef].currentQuestionIndex += 1;
+                          state.question[playerRef] = questions[state.players[playerRef].currentQuestionIndex]
+                          state.players[playerRef].timeLeftToAnswer = TIME_TO_ANSWER;
+                          state.playerAnswers[playerRef] = {};
+                          state.playerAnswers[playerRef].yourAnswer = undefined;
+                          state.playerAnswers[playerRef].correctAnswer = correctAnswers[state.players[playerRef].currentQuestionIndex]?.answerIndex
+                          state.players[playerRef].betweenQuestionsTime = TIME_BETWEEN_QUESTIONS;
+                      }
+                      else{
+                          state.players[playerRef].finished = true;
+                      }
+                  }
                 }
             })
             
@@ -185,7 +199,15 @@ newG({
         // startBlockerFunction: delayStartBlocker.startBlockerFunction(1000),
         // joinBlockerFunction: delayStartBlocker.joinBlockerFunction,
         statePresenter: function (state, playerRef) {
-            
+            if(state.players[playerRef].betweenQuestionsTime > 0){
+              return {
+                  players:state.players,
+                  question: questions[state.players[playerRef].currentQuestionIndex - 1],
+                  yourAnswer:state.playerAnswers[playerRef].yourAnswer,
+                  correctAnswer:state.playerAnswers[playerRef].correctAnswer,
+                  me:state.players[playerRef]
+              };
+            }
             return {
                 players:state.players,
                 question:state.question[playerRef],
@@ -196,6 +218,7 @@ newG({
             state.players[playerRef] = {
                 currentQuestionIndex: 0,
                 timeLeftToAnswer: TIME_TO_ANSWER,
+                betweenQuestionsTime: 0,
                 finished:false,
                 score: 0
             }
