@@ -4,14 +4,17 @@
 <script>
 
     let socket = io();
-
+    let svelteState = {}
 
     socket.on('returnState', (state) => {
         //Draw the game
         console.log(state)
     }) // Return State
 
-
+    function answerQuestion(){
+        console.log('hey')
+        socket.emit('move', { answer:3 })
+    }
 </script>
 
 
@@ -23,6 +26,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+
+    <button onClick="answerQuestion()">Send Question Answer</button>
 </head>
 
 <body>
