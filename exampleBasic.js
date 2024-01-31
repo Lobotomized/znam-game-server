@@ -13,7 +13,7 @@ const delayStartBlocker = require('./blockers').delayStartBlocker
 // score = score + addBonus(answer.extraTime, consecutiveIndex)
 
 const TIME_TO_ANSWER = 20;
-const TIME_BETWEEN_QUESTIONS = 2;
+const TIME_BETWEEN_QUESTIONS = 5;
 
 const correctAnswers = [
     {
@@ -146,7 +146,7 @@ newG({
         moveFunction: function (player, move, state) {
             const playerRef = player.ref;
             const playerAnswered = move.answer;
-            if(playerAnswered != undefined && questions[state.players[playerRef].currentQuestionIndex]){
+            if(playerAnswered != undefined && questions[state.players[playerRef].currentQuestionIndex] != undefined){
                 //Nameri dali e pravilen otgovora
                 state.playerAnswers[playerRef] = {
                   yourAnswer:move.answer,
