@@ -158,7 +158,7 @@ newG({
                     state.players[playerRef].score += 1;
                 }
                 state.players[playerRef].betweenQuestionsTime = TIME_BETWEEN_QUESTIONS;
-                state.player[playerRef].timeLeftToAnswer = TIME_TO_ANSWER;
+                state.players[playerRef].timeLeftToAnswer = TIME_TO_ANSWER;
             }
 
             state.players[playerRef].currentQuestionIndex += 1;
