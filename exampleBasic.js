@@ -180,13 +180,13 @@ newG({
                     state.players[playerRef].timeLeftToAnswer -= 1;
   
                     if(state.players[playerRef].timeLeftToAnswer <= 0 && questions[state.players[playerRef].currentQuestionIndex] != undefined){
-                        state.playerAnswers[playerRef].yourAnswer = undefined;
-                        state.playerAnswers[playerRef].correctAnswer = correctAnswers[state.players[playerRef].currentQuestionIndex]?.answerIndex
-                        state.players[playerRef].currentQuestionIndex += 1;
-                        state.question[playerRef] = questions[state.players[playerRef].currentQuestionIndex]
-                        state.playerAnswers[playerRef] = {};
-
-                        state.players[playerRef].betweenQuestionsTime = TIME_BETWEEN_QUESTIONS;
+  
+                      state.players[playerRef].currentQuestionIndex += 1;
+                      state.question[playerRef] = questions[state.players[playerRef].currentQuestionIndex]
+                      state.playerAnswers[playerRef] = {};
+                      state.playerAnswers[playerRef].yourAnswer = undefined;
+                      state.playerAnswers[playerRef].correctAnswer = correctAnswers[state.players[playerRef].currentQuestionIndex]?.answerIndex
+                      state.players[playerRef].betweenQuestionsTime = TIME_BETWEEN_QUESTIONS;
                     }
                   }
   
