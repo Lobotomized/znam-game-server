@@ -200,12 +200,15 @@ newG({
         // joinBlockerFunction: delayStartBlocker.joinBlockerFunction,
         statePresenter: function (state, playerRef) {
             if(state.players[playerRef].betweenQuestionsTime > 0){
+              
               return {
                   players:state.players,
                   question: questions[state.players[playerRef].currentQuestionIndex - 1],
-                  yourAnswer:state.playerAnswers[playerRef].yourAnswer,
-                  correctAnswer:state.playerAnswers[playerRef].correctAnswer,
-                  me:state.players[playerRef]
+                  me:{
+                    ...state.players[playerRef],
+                    yourAnswer:state.playerAnswers[playerRef].yourAnswer,
+                    correctAnswer:state.playerAnswers[playerRef].correctAnswer
+                  }
               };
             }
             return {
