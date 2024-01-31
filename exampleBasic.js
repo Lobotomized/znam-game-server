@@ -188,7 +188,8 @@ newG({
             
             return {
                 players:state.players,
-                question:state.question[playerRef]
+                question:state.question[playerRef],
+                me:state.players[playerRef]
             };
         },
         connectFunction: function (state, playerRef) {
