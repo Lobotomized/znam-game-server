@@ -165,9 +165,6 @@ newG({
             if(questions[state.players[playerRef].currentQuestionIndex]){
                 state.question[playerRef] = questions[state.players[playerRef].currentQuestionIndex]
             }
-            else{
-                state.players[playerRef].finished = true;
-            }
         },
         maxPlayers: 2, // Number of Players you want in a single game
         timeFunction: function (state) {
@@ -189,10 +186,11 @@ newG({
                           state.playerAnswers[playerRef].correctAnswer = correctAnswers[state.players[playerRef].currentQuestionIndex]?.answerIndex
                           state.players[playerRef].betweenQuestionsTime = TIME_BETWEEN_QUESTIONS;
                       }
-                      else if(state.players[playerRef].betweenQuestionsTime < 0){
-                          state.players[playerRef].finished = true;
-                      }
                   }
+                }
+
+                if(state.players[playerRef].betweenQuestionsTime <= 0 && state.players[playerRef].currentQuestionIndex > (questions.length - 1) ){
+                    state.players[playerRef].finished = true;
                 }
             })
             

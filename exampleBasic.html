@@ -8,7 +8,7 @@
 
     socket.on('returnState', (state) => {
         //Draw the game
-        console.log(state.me.betweenQuestionsTime)
+        console.log(state.me.betweenQuestionsTime, state.me.yourAnswer, state.me.correctAnswer, state.me.finished)
     }) // Return State
 
     function answerQuestion(){
