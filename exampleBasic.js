@@ -231,10 +231,10 @@ newG({
           }
           return;
         }
-        else if(move.answer != undefined){
+        else if(move.answer != undefined && me.timeBetweenQuestionsCounter <=-1){
           //When Answer
           me.answeredIndex = move.answer;
-
+          console.log(me.currentQuestionIndex, state.questions.length)
           if(me.currentQuestionIndex < state.questions.length){
             me.currentQuestionIndex += 1;
           }
@@ -268,7 +268,7 @@ newG({
 
               if(me.timeToAnswerCounter < 0){
                 me.timeBetweenQuestionsCounter = TIME_BETWEEN_QUESTIONS;
-                if(state.questions.length >= me.currentQuestionIndex + 1){
+                if(state.questions.length <= me.currentQuestionIndex + 1){
                   me.finished = true;
                 }
                 else{
