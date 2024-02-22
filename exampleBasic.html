@@ -8,12 +8,14 @@
 
     socket.on('returnState', (state) => {
         //Draw the game
-        console.log(state.me.yourAnswer, state.me.correctAnswer, state.me.timeLeftToAnswer, state.me.betweenQuestionsTime)
+        console.log(state.question, state.me.timeToAnswerCounter)
     }) // Return State
 
     function answerQuestion(){
-        console.log('hey')
         socket.emit('move', { answer:3 })
+    }
+    function stealTime(){
+        socket.emit('move', {joker: '50na50'})
     }
 </script>
 
@@ -28,6 +30,7 @@
     <title>Document</title>
 
     <button onClick="answerQuestion()">Send Question Answer</button>
+    <button onClick="stealTime()">Steal Time</button>
 </head>
 
 <body>
