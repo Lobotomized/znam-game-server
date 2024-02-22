@@ -253,12 +253,6 @@ newG({
               if(me.timeBetweenQuestionsCounter > 0){
                 me.usedJokerTemp = [];
                 me.timeBetweenQuestionsCounter -= 1;
-                if(state.questions.length <= me.currentQuestionIndex + 1){
-                  me.finished = true;
-                }
-                else{
-                  me.currentQuestionIndex += 1;
-                }
                 return;
               }
               else if(me.timeBetweenQuestionsCounter === 0){
@@ -272,6 +266,12 @@ newG({
 
               if(me.timeToAnswerCounter < 0){
                 me.timeBetweenQuestionsCounter = TIME_BETWEEN_QUESTIONS;
+                if(state.questions.length <= me.currentQuestionIndex + 1){
+                  me.finished = true;
+                }
+                else{
+                  me.currentQuestionIndex += 1;
+                }
               }
               else{
                 me.timeToAnswerCounter -= 1;
