@@ -251,7 +251,6 @@ newG({
     timeFunction: function (state) {
         Object.keys(state.players).forEach((playerRef) => {
             const me = state.players[playerRef]
-
             if(!me.finished){
               if(me.timeBetweenQuestionsCounter > 0){
                 me.usedJokerTemp = [];
@@ -264,6 +263,7 @@ newG({
                 if(state.questions[me.currentQuestionIndex]){
                   me.currentQuestion = JSON.parse(JSON.stringify(state.questions[me.currentQuestionIndex]))
                 }
+                me.answeredIndex = undefined;
               }
 
               if(me.timeToAnswerCounter < 0){
@@ -282,7 +282,6 @@ newG({
                   }
                   
                   me.timeBetweenQuestionsCounter = TIME_BETWEEN_QUESTIONS;
-                  me.answeredIndex = undefined;
                 }
               }
 
@@ -297,6 +296,8 @@ newG({
     // joinBlockerFunction: delayStartBlocker.joinBlockerFunction,
     statePresenter: function (state, playerRef) {
         const me  = state.players[playerRef]
+        console.log(me.answeredIndex)
+
         if(me.finished){
           return {
             me:me,
