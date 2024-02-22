@@ -190,6 +190,7 @@ const stealTimeJoker = function(state, me){
 
 const changeQuestion = function(state,me){
   me.currentQuestion = getRandomElementFromArray(state.reserveQuestions)
+  me.timeToAnswerCounter = TIME_TO_ANSWER;
   me.usedJokerTemp.splice(me.usedJokerTemp.indexOf('changeQuestion'), 1);
 }
 
@@ -235,11 +236,8 @@ newG({
           //When Answer
           me.answeredIndex = move.answer;
           console.log(me.currentQuestionIndex, state.questions.length)
-          if(me.currentQuestionIndex < state.questions.length){
+          if(me.currentQuestionIndex + 1 < state.questions.length){
             me.currentQuestionIndex += 1;
-          }
-          else{
-            me.finished = true;
           }
         } else if(move.joker){
           if(me.availableJokers.includes(move.joker)){
@@ -255,6 +253,12 @@ newG({
               if(me.timeBetweenQuestionsCounter > 0){
                 me.usedJokerTemp = [];
                 me.timeBetweenQuestionsCounter -= 1;
+                if(state.questions.length <= me.currentQuestionIndex + 1){
+                  me.finished = true;
+                }
+                else{
+                  me.currentQuestionIndex += 1;
+                }
                 return;
               }
               else if(me.timeBetweenQuestionsCounter === 0){
@@ -268,12 +272,6 @@ newG({
 
               if(me.timeToAnswerCounter < 0){
                 me.timeBetweenQuestionsCounter = TIME_BETWEEN_QUESTIONS;
-                if(state.questions.length <= me.currentQuestionIndex + 1){
-                  me.finished = true;
-                }
-                else{
-                  me.currentQuestionIndex += 1;
-                }
               }
               else{
                 me.timeToAnswerCounter -= 1;
