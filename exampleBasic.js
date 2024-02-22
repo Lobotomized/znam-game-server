@@ -309,6 +309,7 @@ newG({
               me:{
                 ...me,
                 yourAnswer:me.answeredIndex,
+                correctAnswer: me.currentQuestion.correctAnswer
               }
           };
         }
