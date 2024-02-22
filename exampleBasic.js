@@ -261,7 +261,7 @@ newG({
               else if(me.timeBetweenQuestionsCounter === 0){
                 me.timeToAnswerCounter = TIME_TO_ANSWER
                 me.timeBetweenQuestionsCounter -= 1;
-                me.currentQuestion = {...state.questions[me.currentQuestionIndex]}
+                me.currentQuestion = JSON.parse(JSON.stringify(state.questions[me.currentQuestionIndex]))
               }
 
               if(me.timeToAnswerCounter < 0){
@@ -302,7 +302,6 @@ newG({
           }
         }
         if(me.timeBetweenQuestionsCounter > 0){
-           
           return {
               players:state.players,
               question: me.currentQuestion,
