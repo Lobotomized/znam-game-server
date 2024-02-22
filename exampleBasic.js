@@ -316,6 +316,7 @@ newG({
             players:state.players,
             question:{
               ...me.currentQuestion,
+              yourAnswer: me.answeredIndex,
               correctAnswer: undefined
             },
             me:me,
