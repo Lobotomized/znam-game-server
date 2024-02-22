@@ -8,11 +8,10 @@
 
     socket.on('returnState', (state) => {
         //Draw the game
-        console.log( state.me)
     }) // Return State
 
     function answerQuestion(){
-        socket.emit('move', { answer:3 })
+        socket.emit('move', { answer:0 })
     }
     function stealTime(){
         socket.emit('move', {joker: '50na50'})

@@ -231,7 +231,7 @@ newG({
           }
           return;
         }
-        else if(move.answer){
+        else if(move.answer != undefined){
           //When Answer
           me.answeredIndex = move.answer;
 
@@ -268,7 +268,12 @@ newG({
 
               if(me.timeToAnswerCounter < 0){
                 me.timeBetweenQuestionsCounter = TIME_BETWEEN_QUESTIONS;
-                me.currentQuestionIndex += 1;
+                if(state.questions.length >= me.currentQuestionIndex + 1){
+                  me.finished = true;
+                }
+                else{
+                  me.currentQuestionIndex += 1;
+                }
               }
               else{
                 me.timeToAnswerCounter -= 1;
@@ -296,7 +301,6 @@ newG({
     // joinBlockerFunction: delayStartBlocker.joinBlockerFunction,
     statePresenter: function (state, playerRef) {
         const me  = state.players[playerRef]
-        console.log(me.answeredIndex)
 
         if(me.finished){
           return {
