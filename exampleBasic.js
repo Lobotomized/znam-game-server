@@ -326,7 +326,7 @@ newG({
             timeBetweenQuestionsCounter:0,
             timeToAnswerCounter:120,
             finished: false,
-            score: 5,
+            score: 0,
             username:'hui',
         
             usedJokerTemp:[],
