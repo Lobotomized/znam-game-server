@@ -219,9 +219,8 @@ newG({
         reserveQuestions:undefined
     },
     moveFunction: function (player, move, state) {
-        const playerRef = player.ref;
-
-        const me = state.players[playerRef];
+        const me = state.players[player.ref];
+        
         if(move.joker){
           const jokerIndex = me.availableJokers.indexOf(move.joker)
           if(jokerIndex > -1){
@@ -230,119 +229,87 @@ newG({
 
             me.usedJokerTemp.push(...spliced);
           }
-          return;
         }
-        else if(move.answer != undefined && me.timeBetweenQuestionsCounter <=-1){
-          //When Answer
-          me.answeredIndex = move.answer;
-          console.log(me.currentQuestionIndex, state.questions.length)
-          if(me.currentQuestionIndex + 1 < state.questions.length){
-            me.currentQuestionIndex += 1;
-          }
-        } else if(move.joker){
-          if(me.availableJokers.includes(move.joker)){
-            me.availableJokers.splice(me.availableJokers.indexOf(move.joker),1);
-          }
+        else if(move.answer){
+          me.answerIndex = move.answer;
         }
+
     },
     maxPlayers: 2, // Number of Players you want in a single game
     timeFunction: function (state) {
         Object.keys(state.players).forEach((playerRef) => {
-            const me = state.players[playerRef]
-            if(!me.finished){
-              if(me.timeBetweenQuestionsCounter > 0){
-                me.usedJokerTemp = [];
-                me.timeBetweenQuestionsCounter -= 1;
-                return;
-              }
-              else if(me.timeBetweenQuestionsCounter === 0){
-                me.timeToAnswerCounter = TIME_TO_ANSWER
-                me.timeBetweenQuestionsCounter -= 1;
-                if(state.questions[me.currentQuestionIndex]){
-                  me.currentQuestion = JSON.parse(JSON.stringify(state.questions[me.currentQuestionIndex]))
-                }
-                me.answeredIndex = undefined;
-              }
+            const me = state.players[playerRef];
+            
+            switch(me.state){
+              case 'WaitForAnswer':
 
-              if(me.timeToAnswerCounter < 0){
-                me.timeBetweenQuestionsCounter = TIME_BETWEEN_QUESTIONS;
-                if(state.questions.length <= me.currentQuestionIndex + 1){
-                  me.finished = true;
-                }
-                else{
-                  me.currentQuestionIndex += 1;
-                }
-              }
-              else{
-                me.timeToAnswerCounter -= 1;
-              }
+              break;
+              case 'Answer':
+                
+              break;
+              case 'BetweenQuestions':
 
-              if(me.answeredIndex != undefined){
-                if(me.timeBetweenQuestionsCounter < 0){
-                  //check if answer correct
-                  if(me.answeredIndex === me.currentQuestion.correctAnswer){
-                    me.score += 5;
-                  }
-                  
-                  me.timeBetweenQuestionsCounter = TIME_BETWEEN_QUESTIONS;
-                }
-              }
+              break;
+              case 'TimeExpired':
 
-              if(me.usedJokerTemp.length){
-                jokersFunk(state,me)
-              }
+              break;
+              case 'Finish':
+
+              break;
+              case 'Joker':
+
+              break;
+
             }
         })
-        
     },
     // startBlockerFunction: delayStartBlocker.startBlockerFunction(1000),
     // joinBlockerFunction: delayStartBlocker.joinBlockerFunction,
     statePresenter: function (state, playerRef) {
-        const me  = state.players[playerRef]
+        // const me  = state.players[playerRef]
 
-        if(me.finished){
-          return {
-            me:me,
-            players:state.players
-          }
-        }
-        if(me.timeBetweenQuestionsCounter > 0){
-          return {
-              players:state.players,
-              question: me.currentQuestion,
-              me:{
-                ...me,
-                yourAnswer:me.answeredIndex,
-                correctAnswer: me.currentQuestion.correctAnswer
-              }
-          };
-        }
-        return {
-            players:state.players,
-            question:{
-              ...me.currentQuestion,
-              correctAnswer: undefined
-            },
-            me:me,
-        };
+        // if(me.finished){
+        //   return {
+        //     me:me,
+        //     players:state.players
+        //   }
+        // }
+        // if(me.timeBetweenQuestionsCounter > 0){
+        //   return {
+        //       players:state.players,
+        //       question: me.currentQuestion,
+        //       me:{
+        //         ...me,
+        //         yourAnswer:me.answeredIndex,
+        //         correctAnswer: me.currentQuestion.correctAnswer
+        //       }
+        //   };
+        // }
+        // return {
+        //     players:state.players,
+        //     question:{
+        //       ...me.currentQuestion,
+        //       correctAnswer: undefined
+        //     },
+        //     me:me,
+        // };
     },
     connectFunction: function (state, playerRef) {
         state.players[playerRef] = {
             timeBetweenQuestionsCounter:0,
-            timeToAnswerCounter:120,
+            timeToAnswerCounter:TIME_TO_ANSWER,
             finished: false,
             score: 0,
             username:'hui',
-        
+
             usedJokerTemp:[],
             availableJokers: ['50na50','stealTime','changeQuestion'],
             answeredQuestion: undefined,
             currentQuestionIndex: 0,
-            currentQuestion: undefined
-            // timeLeftToAnswer: TIME_TO_ANSWER,c
-            // betweenQuestionsTime: 0,
-            // finished:false,
-            // score: 0
+            currentQuestion: undefined,
+
+            state:undefined
+
         }
         const questionsAndReserve = generateRandomSubset(questions,3)
         state.questions = questionsAndReserve[0];
