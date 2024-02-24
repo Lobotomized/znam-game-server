@@ -13,22 +13,6 @@ const { WaitForAnswer, BetweenQuestions, Answer, TimeExpired, Joker, Final, TIME
 // };
 // score = score + addBonus(answer.extraTime, consecutiveIndex)
 
-
-function getRandomElementFromArray(arr) {
-  
-  const index = Math.floor(Math.random() * arr.length);
-  return arr[index];
-}
-function getTwoUniqueRandomIntegersInRangeExcluding(min, max, excluded) {
-  let randomNumber1, randomNumber2;
-  do {
-    randomNumber1 = Math.floor(Math.random() * (max - min + 1)) + min;
-  } while (randomNumber1 === excluded);
-  do {
-    randomNumber2 = Math.floor(Math.random() * (max - min + 1)) + min;
-  } while (randomNumber2 === excluded || randomNumber2 === randomNumber1);
-  return [randomNumber1, randomNumber2];
-}
 function generateRandomSubset(arr, numElements) {
   if (numElements > arr.length || numElements <= 0) {
     throw new Error('Invalid number of elements requested');
@@ -241,7 +225,7 @@ newG({
                   ...me.currentQuestion,
                   correctAnswer: undefined
                 },
-                me:me,
+                me:{...me, currentQuestion: undefined},
             };
         }
     },

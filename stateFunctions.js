@@ -5,13 +5,33 @@ module.exports.TIME_TO_ANSWER =  TIME_TO_ANSWER;
 module.exports.TIME_BETWEEN_QUESTIONS = TIME_BETWEEN_QUESTIONS;
 
 
+//helper functions
+
+function getRandomElementFromArray(arr) {
+  
+    const index = Math.floor(Math.random() * arr.length);
+    return arr[index];
+  }
+  function getTwoUniqueRandomIntegersInRangeExcluding(min, max, excluded) {
+    let randomNumber1, randomNumber2;
+    do {
+      randomNumber1 = Math.floor(Math.random() * (max - min + 1)) + min;
+    } while (randomNumber1 === excluded);
+    do {
+      randomNumber2 = Math.floor(Math.random() * (max - min + 1)) + min;
+    } while (randomNumber2 === excluded || randomNumber2 === randomNumber1);
+    return [randomNumber1, randomNumber2];
+  }
+
 
 //Jokers
 
+
 const removeTwo = function(state, me){
     let removed = getTwoUniqueRandomIntegersInRangeExcluding(0,me.currentQuestion.answers.length - 1, me.currentQuestion.correctAnswer);
-    me.currentQuestion.answers[removed[0]].text = '';
-    me.currentQuestion.answers[removed[1]].text = '';
+    me.currentQuestion.answers[removed[0]].disabled = true;
+    me.currentQuestion.answers[removed[1]].disabled  = true;
+
     me.usedJokerTemp.splice(me.usedJokerTemp.indexOf('50na50'), 1);
   
   }
@@ -52,7 +72,9 @@ const removeTwo = function(state, me){
   }
 
 module.exports.WaitForAnswer = function(state,me){
-    me.currentQuestion = JSON.parse(JSON.stringify(state.questions[me.currentQuestionIndex]));
+    if(!me.currentQuestion){
+        me.currentQuestion = JSON.parse(JSON.stringify(state.questions[me.currentQuestionIndex]));
+    }
     me.timeToAnswerCounter -=1;
     if(me.answerIndex != undefined){
         me.state = 'Answer';
@@ -112,7 +134,7 @@ module.exports.TimeExpired = function(state,me){
 
 
 module.exports.Joker = function(state,me){
-    
+    jokersFunk(state,me)
     me.state = 'WaitForAnswer'
 }
 
