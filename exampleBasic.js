@@ -5,7 +5,7 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const newG = require('./globby').newIOServer;
 const delayStartBlocker = require('./blockers').delayStartBlocker
-
+const { WaitForAnswer, BetweenQuestions, Answer, TimeExpired, Joker, Final, TIME_TO_ANSWER } = require('./stateFunctions');
 
 // let consecutiveBonusMultipliers = [1, 1.1, 1.2, 1.3, 1.35, 1.4, 1.45, 1.5];
 // let addBonus = (extraTime, bonusIndex) => {
@@ -13,8 +13,6 @@ const delayStartBlocker = require('./blockers').delayStartBlocker
 // };
 // score = score + addBonus(answer.extraTime, consecutiveIndex)
 
-const TIME_TO_ANSWER = 20;
-const TIME_BETWEEN_QUESTIONS = 5;
 
 function getRandomElementFromArray(arr) {
   
@@ -165,51 +163,6 @@ type playerProgress = {
 */
 
 
-//Jokers
-
-const removeTwo = function(state, me){
-  let removed = getTwoUniqueRandomIntegersInRangeExcluding(0,me.currentQuestion.answers.length - 1, me.currentQuestion.correctAnswer);
-  me.currentQuestion.answers[removed[0]].text = '';
-  me.currentQuestion.answers[removed[1]].text = '';
-  me.usedJokerTemp.splice(me.usedJokerTemp.indexOf('50na50'), 1);
-
-}
-
-const stealTimeJoker = function(state, me){
-
-  Object.keys(state.players).forEach((playerRef) => {
-    const player = state.players[playerRef]
-    if(player !== me){
-      player.timeToAnswerCounter -= 2;
-      me.timeToAnswerCounter += 2;
-    }
-  })
-  me.usedJokerTemp.splice(me.usedJokerTemp.indexOf('stealTime'), 1);
-}
-
-
-const changeQuestion = function(state,me){
-  me.currentQuestion = getRandomElementFromArray(state.reserveQuestions)
-  me.timeToAnswerCounter = TIME_TO_ANSWER;
-  me.usedJokerTemp.splice(me.usedJokerTemp.indexOf('changeQuestion'), 1);
-}
-
-function jokersFunk(state,me){
-  me.usedJokerTemp.forEach((joker) => {
-    switch(joker){
-      case "stealTime":
-          stealTimeJoker(state,me)
-        break;
-      case "changeQuestion":
-          changeQuestion(state,me)
-        break;
-      case "50na50":
-        removeTwo(state,me);
-        break;
-    }
-  })
-}
-
 app.use('/static', express.static('public'))
 
 newG({
@@ -220,7 +173,6 @@ newG({
     },
     moveFunction: function (player, move, state) {
         const me = state.players[player.ref];
-        
         if(move.joker){
           const jokerIndex = me.availableJokers.indexOf(move.joker)
           if(jokerIndex > -1){
@@ -230,7 +182,7 @@ newG({
             me.usedJokerTemp.push(...spliced);
           }
         }
-        else if(move.answer){
+        else if(move.answer != undefined){
           me.answerIndex = move.answer;
         }
 
@@ -239,25 +191,24 @@ newG({
     timeFunction: function (state) {
         Object.keys(state.players).forEach((playerRef) => {
             const me = state.players[playerRef];
-            
             switch(me.state){
               case 'WaitForAnswer':
-
+                WaitForAnswer(state,me)
               break;
               case 'Answer':
-                
+                Answer(state,me)
               break;
               case 'BetweenQuestions':
-
+                BetweenQuestions(state,me)
               break;
               case 'TimeExpired':
-
+                TimeExpired(state,me)
               break;
-              case 'Finish':
-
+              case 'Final':
+                Final(state,me)
               break;
               case 'Joker':
-
+                Joker(state,me)
               break;
 
             }
@@ -266,33 +217,33 @@ newG({
     // startBlockerFunction: delayStartBlocker.startBlockerFunction(1000),
     // joinBlockerFunction: delayStartBlocker.joinBlockerFunction,
     statePresenter: function (state, playerRef) {
-        // const me  = state.players[playerRef]
-
-        // if(me.finished){
-        //   return {
-        //     me:me,
-        //     players:state.players
-        //   }
-        // }
-        // if(me.timeBetweenQuestionsCounter > 0){
-        //   return {
-        //       players:state.players,
-        //       question: me.currentQuestion,
-        //       me:{
-        //         ...me,
-        //         yourAnswer:me.answeredIndex,
-        //         correctAnswer: me.currentQuestion.correctAnswer
-        //       }
-        //   };
-        // }
-        // return {
-        //     players:state.players,
-        //     question:{
-        //       ...me.currentQuestion,
-        //       correctAnswer: undefined
-        //     },
-        //     me:me,
-        // };
+        const me  = state.players[playerRef]
+        switch(me.state){
+          case 'BetweenQuestions':
+              return {
+                  players:state.players,
+                  question: me.currentQuestion,
+                  me:{
+                    ...me,
+                    yourAnswer:me.answeredIndex,
+                    correctAnswer: me.currentQuestion.correctAnswer
+                  }
+              };
+          case 'Final':
+            return {
+              me:me,
+              players:state.players
+            }
+          default :
+            return {
+                players:state.players,
+                question:{
+                  ...me.currentQuestion,
+                  correctAnswer: undefined
+                },
+                me:me,
+            };
+        }
     },
     connectFunction: function (state, playerRef) {
         state.players[playerRef] = {
@@ -308,7 +259,7 @@ newG({
             currentQuestionIndex: 0,
             currentQuestion: undefined,
 
-            state:undefined
+            state:'WaitForAnswer'
 
         }
         const questionsAndReserve = generateRandomSubset(questions,3)
