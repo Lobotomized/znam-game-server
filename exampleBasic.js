@@ -209,7 +209,7 @@ newG({
                   question: me.currentQuestion,
                   me:{
                     ...me,
-                    yourAnswer:me.answeredIndex,
+                    yourAnswer:me.answerIndex,
                     correctAnswer: me.currentQuestion.correctAnswer
                   }
               };
