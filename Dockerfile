@@ -8,7 +8,6 @@ COPY . /usr/src/app
 RUN apk --no-cache add curl tzdata
 RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN npm install
-RUN node exampleBasic
 
 FROM node:20.1-alpine
 WORKDIR /usr/src/app
