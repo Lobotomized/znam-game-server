@@ -20,4 +20,4 @@ COPY --from=sk-build /usr/src/app/package.json /usr/src/app/package.json
 COPY --from=sk-build /usr/src/app/package-lock.json /usr/src/app/package-lock.json
 
 EXPOSE 3001
-CMD ["node", "build/index.js"]
+CMD ["node", "exampleBasic"]
