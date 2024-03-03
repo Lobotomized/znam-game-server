@@ -1,23 +1,23 @@
-FROM node:20.1-alpine AS sk-build
-WORKDIR /usr/src/app
+# Use the official Node.js 20.2.0 image with Alpine Linux as the base image
+FROM node:20.2.0-alpine
 
-ARG TZ=Europe/Stockholm
-ARG PUBLIC_HELLO
+# Set the working directory in the container
+WORKDIR /app
 
-COPY . /usr/src/app
-RUN apk --no-cache add curl tzdata
-RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# Copy the package.json and package-lock.json files to the container
+COPY package*.json ./
+
+# Install application dependencies
 RUN npm install
 
-FROM node:20.1-alpine
-WORKDIR /usr/src/app
+# Copy the rest of your application code to the container
+COPY . .
 
-ARG TZ=Europe/Stockholm
-RUN apk --no-cache add curl tzdata
-RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-COPY --from=sk-build /usr/src/app/package.json /usr/src/app/package.json
-COPY --from=sk-build /usr/src/app/package-lock.json /usr/src/app/package-lock.json
-
+# Expose the port your Node.js application will listen on
 EXPOSE 3001
-CMD ["node", "exampleBasic"]
+
+# Use nodemon for development (install it globally)
+RUN npm install -g nodemon
+
+# Define the startup command using nodemon
+CMD ["nodemon", "exampleBasic.js"]
