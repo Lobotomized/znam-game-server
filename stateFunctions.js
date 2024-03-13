@@ -113,14 +113,19 @@ module.exports.BetweenQuestions = function(state,me){
 }
 
 module.exports.Answer = function(state,me){
-    
     if(me.currentQuestion.correctAnswer === me.answerIndex){
-        me.score += 5;
+      me.consecutiveAnswers += 1
+      me.score += addBonus(me.timeToAnswerCounter, me.consecutiveAnswers);
+    } else {
+      me.consecutiveAnswers += 0
     }
     me.state = 'BetweenQuestions';
 }
 
-
+const consecutiveBonusMultipliers = [1, 1, 1.1, 1.2, 1.3, 1.35, 1.4, 1.45, 1.5];
+const addBonus = (extraTime, bonusIndex) => {
+  return extraTime * consecutiveBonusMultipliers[bonusIndex];
+};
 
 module.exports.TimeExpired = function(state,me){
     if(me.currentQuestionIndex === state.questions.length - 1){

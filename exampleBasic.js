@@ -7,12 +7,6 @@ const newG = require('./globby').newIOServer;
 const delayStartBlocker = require('./blockers').delayStartBlocker
 const { WaitForAnswer, BetweenQuestions, Answer, TimeExpired, Joker, Final, TIME_TO_ANSWER } = require('./stateFunctions');
 
-// let consecutiveBonusMultipliers = [1, 1.1, 1.2, 1.3, 1.35, 1.4, 1.45, 1.5];
-// let addBonus = (extraTime, bonusIndex) => {
-//   return extraTime * consecutiveBonusMultipliers[bonusIndex];
-// };
-// score = score + addBonus(answer.extraTime, consecutiveIndex)
-
 function generateRandomSubset(arr, numElements) {
   if (numElements > arr.length || numElements <= 0) {
     throw new Error('Invalid number of elements requested');
@@ -236,7 +230,8 @@ newG({
             finished: false,
             score: 0,
             username:'hui',
-
+            consecutiveAnswers: 0,
+            
             usedJokerTemp:[],
             availableJokers: ['50na50','stealTime','changeQuestion'],
             answeredQuestion: undefined,
