@@ -6,6 +6,7 @@ const io = require('socket.io')(http);
 const newG = require('./globby').newIOServer;
 const delayStartBlocker = require('./blockers').delayStartBlocker
 const { WaitForAnswer, BetweenQuestions, Answer, TimeExpired, Joker, Final, TIME_TO_ANSWER } = require('./stateFunctions');
+const { questionsPool } = require('./constants');
 
 function generateRandomSubset(arr, numElements) {
   if (numElements > arr.length || numElements <= 0) {
@@ -33,102 +34,7 @@ function generateRandomSubset(arr, numElements) {
   return [result, rest];
 }
 
-const questions = [
-  {
-    _id: "1",
-    title: "Коя година е създадена България?",
-    answers: [
-      {
-        _id: "1.1",
-        text: "681г.",
-      },
-      {
-        _id: "1.2",
-        text: "682г.",
-      },
-      {
-        _id: "1.3",
-        text: "680г.",
-      },
-      {
-        _id: "1.4",
-        text: "685г.",
-      },
-    ],
-    correctAnswer:0,
-  },
-  {
-    _id: "2",
-    title: "Как се казвам?",
-    answers: [
-      {
-        _id: "2.1",
-        text: "Шави",
-      },
-      {
-        _id: "2.2",
-        text: "Алекс",
-      },
-      {
-        _id: "2.3",
-        text: "Ники",
-      },
-      {
-        _id: "2.4",
-        text: "Иво",
-      },
-    ],
-    correctAnswer:1,
-  },
-  {
-    _id: "3",
-    title: "Какъв тест е това?",
-    answers: [
-      {
-        _id: "3.1",
-        text: "По български",
-      },
-      {
-        _id: "3.2",
-        text: "По математика???",
-      },
-      {
-        _id: "3.3",
-        text: "Образувателен",
-      },
-      {
-        _id: "3.4",
-        text: "Нещо друго",
-      },
-    ],
-    correctAnswer:3,
-  },
-  {
-    _id: "4",
-    title: "Още един въпрос?",
-    answers: [
-      {
-        _id: "4.1",
-        text: "Отговор 1",
-      },
-      {
-        _id: "4.2",
-        text: "Отговор 2",
-      },
-      {
-        _id: "4.3",
-        text: "Правилен отговор",
-      },
-      {
-        _id: "4.4",
-        text: "Отговор 4",
-      },
-    ],
-    correctAnswer:2,
-  },
-];
-
-
+const questions = questionsPool;
 
 /*
 type playersProgress = { [userID: string]: playerProgress };
@@ -205,12 +111,14 @@ newG({
                     ...me,
                     yourAnswer:me.answerIndex,
                     correctAnswer: me.currentQuestion.correctAnswer
-                  }
+                  },
+                  globalState: state.globalState
               };
           case 'Final':
             return {
               me:me,
-              players:state.players
+              players:state.players,
+              globalState: state.globalState
             }
           default :
             return {
@@ -220,6 +128,7 @@ newG({
                   correctAnswer: undefined
                 },
                 me:{...me, currentQuestion: undefined},
+                globalState: state.globalState
             };
         }
     },
@@ -229,7 +138,7 @@ newG({
             timeToAnswerCounter:TIME_TO_ANSWER,
             finished: false,
             score: 0,
-            username:'hui',
+            username: playerRef,
             consecutiveAnswers: 0,
             
             usedJokerTemp:[],
@@ -241,10 +150,13 @@ newG({
             state:'WaitForAnswer'
 
         }
-        const questionsAndReserve = generateRandomSubset(questions,3)
+        const questionsAndReserve = generateRandomSubset(questions,15)
         state.questions = questionsAndReserve[0];
         state.reserveQuestions = questionsAndReserve[1];
-    },
+        state.globalState = {
+          questionsLength: state.questions.length
+        }
+  },
     disconnectFunction: function (state, playerRef) {
         state[playerRef] = undefined;
     },
