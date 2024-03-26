@@ -1,6 +1,6 @@
 
 const TIME_BETWEEN_QUESTIONS  = 5;
-const TIME_TO_ANSWER = 20;
+const TIME_TO_ANSWER = 30;
 module.exports.TIME_TO_ANSWER =  TIME_TO_ANSWER;
 module.exports.TIME_BETWEEN_QUESTIONS = TIME_BETWEEN_QUESTIONS;
 
@@ -41,8 +41,8 @@ const removeTwo = function(state, me){
     Object.keys(state.players).forEach((playerRef) => {
       const player = state.players[playerRef]
       if(player !== me){
-        player.timeToAnswerCounter -= 2;
-        me.timeToAnswerCounter += 2;
+        player.timeToAnswerCounter -= 6;
+        me.timeToAnswerCounter += 10;
       }
     })
     me.usedJokerTemp.splice(me.usedJokerTemp.indexOf('stealTime'), 1);

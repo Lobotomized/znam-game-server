@@ -150,7 +150,7 @@ newG({
             state:'WaitForAnswer'
 
         }
-        const questionsAndReserve = generateRandomSubset(questions,15)
+        const questionsAndReserve = generateRandomSubset(questions,10)
         state.questions = questionsAndReserve[0];
         state.reserveQuestions = questionsAndReserve[1];
         state.globalState = {
