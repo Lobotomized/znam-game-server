@@ -162,7 +162,35 @@ newG({
     },
     delay:500
 },
-io)
+io,
+false,
+{
+  joinBotFunction: function (game, minPlayers, maxPlayers) {
+      if(!game.timer){
+        game.timer = 1;
+      }
+      else{
+        game.timer++;
+      }
+      if ( game.players.length === 1) {
+          if(game.timer > 5){
+            game.joinBot('tralala')
+            game.timer = 0;
+          }
+          //game.joinBot('tralala')
+      }
+  },
+  botAIFunction: function (game, bot) {
+      if(game.timer > 5){
+        game.move(bot.socketId, {answer:1})
+        game.timer = 0;
+      }
+      else{
+        game.timer++
+      }
+      
+  }
+})
 
 
 app.get('/', function (req, res) {
