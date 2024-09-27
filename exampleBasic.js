@@ -182,7 +182,7 @@ false,
   },
   botAIFunction: function (game, bot) {
       if(game.timer > 5){
-        game.move(bot.socketId, {answer:1})
+        game.move(bot.socketId, {answer:(Math.random() * (4 - 1) + 1)})
         game.timer = 0;
       }
       else{
